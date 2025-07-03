@@ -1,0 +1,13 @@
+[project]
+name = "box-course"
+version = "0.1.0"
+description = "Script to process Box invoices with Gemini and store in SQLite"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "python-dotenv>=1.0.1",
+    "google-generativeai>=0.3.1",
+    "PyPDF2>=3.0.1",
+    "uvicorn>=0.29.0",
+    "box-sdk-gen>=1.15.0",
+]
