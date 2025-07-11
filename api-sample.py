@@ -14,7 +14,6 @@ load_dotenv(override=True)
 BOX_FOLDER_ID = os.getenv("BOX_FOLDER_ID")
 BOX_DEVELOPER_TOKEN = os.getenv("BOX_DEVELOPER_TOKEN")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-MODEL_NAME = "gemini-2.5-flash"
 LOCAL_INVOICE_FOLDER = "invoices"
 
 
@@ -31,7 +30,7 @@ def get_available_invoices_from_box(client: BoxClient):
     return files
 
 
-def download_invoices():
+def download_invoices_from_box():
     """
     Download invoices from Box to a local folder.
     """
@@ -53,7 +52,11 @@ def download_invoices():
             print(f"{invoice.name} already exists in the local folder.")
 
 
-async def extract_invoice_fields(file: str, text: str):
+async def extract_invoice_fields(file: str, invoice: str):
+    """
+    Extract data from the supplied invoice text.
+    """
+    print(f"Extracting data from invoice {file}...")
     client = genai.Client(api_key=GEMINI_API_KEY)
 
     prompt = (
@@ -67,7 +70,7 @@ async def extract_invoice_fields(file: str, text: str):
         "2. invoice_amount (float) "
         "3. product_name (string) "
         "If the information is not found, return 'null' for the corresponding key.\n"
-        f"Invoice text:\n{text}"
+        f"Invoice text:\n{invoice}"
     )
 
     try:
@@ -102,7 +105,7 @@ async def process_invoices(connection: sqlite3.Connection):
 
 if __name__ == "__main__":
     connection = setup_database()
-    download_invoices()
+    download_invoices_from_box()
     asyncio.run(process_invoices(connection))
     generate_report(connection)
     connection.close()

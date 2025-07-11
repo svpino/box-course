@@ -25,6 +25,9 @@ BOX_MCP_TOOLS = [
 
 
 async def get_mcp_tools(session: ClientSession):
+    """
+    Set up the list of MCP tools that will be used to interact with Box.
+    """
     mcp_tools = await session.list_tools()
     return [
         types.Tool(
@@ -51,7 +54,7 @@ async def get_list_of_invoices(
     return await generate(prompt, client, session, tools)
 
 
-async def get_invoice_data(
+async def extract_invoice_fields(
     invoice: dict, client: genai.Client, session: ClientSession, tools: list
 ):
     """
@@ -71,6 +74,9 @@ async def get_invoice_data(
 
 
 async def process_invoices(connection: sqlite3.Connection):
+    """
+    Process all invoices in the Box folder.
+    """
     client = genai.Client(api_key=GEMINI_API_KEY)
 
     server_params = StdioServerParameters(
@@ -92,7 +98,9 @@ async def process_invoices(connection: sqlite3.Connection):
             print(f"Found {len(invoices)} invoices")
 
             for invoice in invoices:
-                invoice_data = await get_invoice_data(invoice, client, session, tools)
+                invoice_data = await extract_invoice_fields(
+                    invoice, client, session, tools
+                )
                 update_invoice_in_database(connection, invoice_data)
 
 
