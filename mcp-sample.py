@@ -23,6 +23,17 @@ BOX_MCP_TOOLS = [
     "box_ai_extract_tool",
 ]
 
+PROMPT2 = """
+You are a helpful assistant that can extract data from invoices.
+You will be given a list of invoices and you will need to extract the data from each invoice.
+You will need to extract the following data from the invoice:
+- Client name
+- Invoice amount
+- Product name
+
+Return the invoice_amount as a float.
+"""
+
 
 async def get_mcp_tools(session: ClientSession):
     """
