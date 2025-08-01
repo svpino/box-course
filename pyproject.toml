@@ -14,4 +14,5 @@ dependencies = [
     "a2a-sdk==0.2.16",
     "google-adk>=1.8.0",
     "nest-asyncio>=1.6.0",
+    "ruff>=0.12.7",
 ]
