@@ -4,7 +4,7 @@ import json
 import sqlite3
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
-from box_sdk_gen import BoxClient, BoxDeveloperTokenAuth
+from box_sdk_gen import BoxClient, BoxCCGAuth, CCGConfig
 from google import genai
 from database import setup_database, update_invoice_in_database, generate_report
 from model import generate, parse_json
@@ -12,10 +12,26 @@ from model import generate, parse_json
 load_dotenv(override=True)
 
 BOX_FOLDER_ID = os.getenv("BOX_FOLDER_ID")
-BOX_DEVELOPER_TOKEN = os.getenv("BOX_DEVELOPER_TOKEN")
+BOX_CLIENT_ID = os.getenv("BOX_CLIENT_ID")
+BOX_CLIENT_SECRET = os.getenv("BOX_CLIENT_SECRET")
+BOX_SUBJECT_TYPE = os.getenv("BOX_SUBJECT_TYPE")
+BOX_SUBJECT_ID = os.getenv("BOX_SUBJECT_ID")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 LOCAL_INVOICE_FOLDER = "invoices"
 
+
+def get_box_client():
+    """
+    Create and return a Box client using the developer token.
+    """
+    ccg_config: CCGConfig = CCGConfig(
+        client_id="l6lp8njqibhlw36lgfvy257i22r3uqfb",
+        client_secret="fbWowQbz7pkjVvzTOPihCTkzrmXAGNMx",
+        user_id="19498290761"
+    )
+    auth: BoxCCGAuth = BoxCCGAuth(config=ccg_config)
+    
+    return BoxClient(auth=auth)
 
 def get_available_invoices_from_box(client: BoxClient):
     """
@@ -34,8 +50,8 @@ def download_invoices_from_box():
     """
     Download invoices from Box to a local folder.
     """
-    auth: BoxDeveloperTokenAuth = BoxDeveloperTokenAuth(token=BOX_DEVELOPER_TOKEN)
-    client: BoxClient = BoxClient(auth=auth)
+    
+    client: BoxClient = get_box_client()
 
     files = get_available_invoices_from_box(client)
     os.makedirs(LOCAL_INVOICE_FOLDER, exist_ok=True)
